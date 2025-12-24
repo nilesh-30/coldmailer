@@ -102,7 +102,3 @@ VITE_API_URL=http://localhost:5000/api
 - [ ] Email open tracking
 - [ ] CSV import functionality
 - [ ] Advanced analytics
-
-## License
-
-MIT
