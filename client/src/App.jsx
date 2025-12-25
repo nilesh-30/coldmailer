@@ -1,7 +1,5 @@
-"use client"
-
+import { useContext } from "react"
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import { useAuth } from "./context/AuthContext"
 import { Toaster } from "./components/ui/toaster"
 import LoginPage from "./pages/LoginPage"
 import SignupPage from "./pages/SignupPage"
@@ -14,8 +12,8 @@ import SettingsPage from "./pages/SettingsPage"
 import Layout from "./components/layout/Layout"
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth()
-  return isAuthenticated ? children : <Navigate to="/login" replace />
+  const { user } = useContext(AuthContext); // Access user context
+  return user ? children : <Navigate to="/login" replace/>; // If no user, redirect to login
 }
 
 function App() {

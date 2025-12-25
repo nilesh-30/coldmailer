@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Mail } from "lucide-react"
@@ -8,26 +6,27 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useAuth } from "@/context/AuthContext"
+import { apiService } from "../services/api"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
-  const { login } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
 
     if (!email || !password) {
-      setError("Please fill in all fields")
-      return
+      setError("Please fill in all fields");
+      return;
     }
 
-    const result = login(email, password)
-    if (result.success) {
+    const response = await apiService.login(email, password); // Call the login API
+    setUser(response.user); // Set user in the context if login successful
+    
+    if (response.success) {
       navigate("/dashboard")
     } else {
       setError("Invalid credentials")

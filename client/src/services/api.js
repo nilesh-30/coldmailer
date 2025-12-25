@@ -1,68 +1,57 @@
-// API service for future backend integration
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+import axios from 'axios';
 
-export const api = {
-  // Authentication
+// Define your API base URL (use environment variable for production)
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+
+// Create an axios instance with the base URL and send cookies automatically
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true, // This ensures cookies are sent with requests
+});
+
+// API service functions
+
+export const apiService = {
+  // Login user
   login: async (email, password) => {
-    // Replace with actual API call
-    return { success: true, token: "mock-token" }
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      return response.data; // This will contain the JWT cookie set by the backend
+    } catch (error) {
+      console.error("Login failed", error);
+      throw new Error(error.response.data.message || "Login failed");
+    }
   },
 
+  // Register user
   signup: async (name, email, password) => {
-    // Replace with actual API call
-    return { success: true, token: "mock-token" }
+    try {
+      const response = await api.post('/auth/register', { name, email, password });
+      return response.data; // This will contain the JWT cookie set by the backend
+    } catch (error) {
+      console.error("Signup failed", error);
+      throw new Error(error.response.data.message || "Signup failed");
+    }
   },
 
-  // Contacts
-  getContacts: async () => {
-    // Replace with actual API call
-    return []
+  // Get current user (protected route)
+  getMe: async () => {
+    try {
+      const response = await api.get('/auth/me');
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch user", error);
+      throw new Error("Unauthorized access");
+    }
   },
 
-  createContact: async (contact) => {
-    // Replace with actual API call
-    return { success: true, contact }
+  // Logout user (delete JWT cookie)
+  logout: async () => {
+    try {
+      await api.post('/auth/logout');
+      // The backend will clear the cookie
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   },
-
-  updateContact: async (id, contact) => {
-    // Replace with actual API call
-    return { success: true, contact }
-  },
-
-  deleteContact: async (id) => {
-    // Replace with actual API call
-    return { success: true }
-  },
-
-  // Templates
-  getTemplates: async () => {
-    // Replace with actual API call
-    return []
-  },
-
-  createTemplate: async (template) => {
-    // Replace with actual API call
-    return { success: true, template }
-  },
-
-  updateTemplate: async (id, template) => {
-    // Replace with actual API call
-    return { success: true, template }
-  },
-
-  deleteTemplate: async (id) => {
-    // Replace with actual API call
-    return { success: true }
-  },
-
-  // Emails
-  sendEmail: async (templateId, contactIds) => {
-    // Replace with actual API call
-    return { success: true, sent: contactIds.length }
-  },
-
-  getEmailLogs: async () => {
-    // Replace with actual API call
-    return []
-  },
-}
+};

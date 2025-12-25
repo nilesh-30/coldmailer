@@ -1,39 +1,33 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useState, useEffect } from 'react';
+import { apiService } from '../services/api';
 
-const AuthContext = createContext(null)
+export const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [user, setUser] = useState(null)
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null); // Holds the logged-in user data
 
-  const login = (email, password) => {
-    // Static login for demo - replace with API call later
-    setIsAuthenticated(true)
-    setUser({ email, name: "John Doe" })
-    return { success: true }
-  }
+  useEffect(() => {
+    // Fetch user data on page load to check if the user is logged in
+    const checkUser = async () => {
+      try {
+        const userData = await apiService.getMe(); // Fetch the user from the API
+        setUser(userData.user); // Set the user in the context if authenticated
+      } catch (error) {
+        setUser(null); // If user is not authenticated, reset user state
+      }
+    };
 
-  const signup = (email, password) => {
-    // Static signup for demo - replace with API call later
-    setIsAuthenticated(true)
-    setUser({ email, name: "John Doe" })
-    return { success: true }
-  }
+    checkUser(); // Call the checkUser function
+  }, []);
 
-  const logout = () => {
-    setIsAuthenticated(false)
-    setUser(null)
-  }
+  const logout = async () => {
+    await apiService.logout(); // Call the logout function from the service
+    setUser(null); // Reset user state
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, signup, logout }}>{children}</AuthContext.Provider>
-  )
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
-  return context
-}
+    <AuthContext.Provider value={{ user, setUser, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

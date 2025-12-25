@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useAuth } from "@/context/AuthContext"
+import { apiService } from "../services/api"
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -14,11 +14,9 @@ export default function SignupPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
-  const { signup } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
     setSuccess("")
@@ -38,9 +36,9 @@ export default function SignupPage() {
       return
     }
 
-    const result = signup(email, password)
-    if (result.success) {
-      setSuccess("Account created successfully!")
+    const response = await apiService.signup(name, email, password);
+    
+    if (response.success) {
       setTimeout(() => navigate("/dashboard"), 1500)
     } else {
       setError("Failed to create account")
